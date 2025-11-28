@@ -1,42 +1,39 @@
 import { useEffect, useState } from "react";
 import axios from "../../services/lib/axios";
-import { getClients } from "../../services/api/clients";
-import { getProducts } from "../../services/api/products";
-import { getUserAdmins } from "../../services/api/userAdmin";
-import { getInterations } from "../../services/api/interation";
-import type { Clients } from "../../services/types/clients";
-import type { products } from "../../services/types/products";
-import type { userAdmin } from "../../services/types/userAdmin";
-import type { Interation, StatusType } from "../../services/types/interation";
+import { clientsService } from "../../services/api/clients/clients";
+import { interactionsService } from "../../services/api/interations/interation";
+import { productsService } from "../../services/api/products/products";
+import { adminService } from "../../services/api/userAdmins/userAdmin";
+import { Users, Package, Shield, Activity, Loader2 } from "lucide-react";
+
+type StatusType = "NOVO_LEAD" | "VENDA_FEITA" | "PERDIDO";
+
+interface Interacao {
+  id: string;
+  cliente: { nome: string; email: string };
+  produto: { name: string };
+  dataInteration: string;
+  status: StatusType;
+}
 
 export default function Dashboard() {
-  const [clients, setClients] = useState<Clients[]>([]);
-  const [products, setProducts] = useState<products[]>([]);
-  const [admins, setAdmins] = useState<userAdmin[]>([]);
-  const [interacoes, setInteracoes] = useState<Interation[]>([]);
+  const [clients, setClients] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [admins, setAdmins] = useState([]);
+  const [interacoes, setInteracoes] = useState<Interacao[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [clientsData, productsData, adminsData, interData] = await Promise.all([
-          getClients(),
-          getProducts(),
-          getUserAdmins(),
-          getInterations(),
-        ]);
-        setClients(clientsData);
-        setProducts(productsData);
-        setAdmins(adminsData);
-        setInteracoes(interData);
-      } catch (err) {
-        console.error("Erro ao carregar dashboard:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    clientsService.getAll().then((res) => setClients(res.data));
+    productsService.getAll().then((res) => setProducts(res.data));
+    adminService.getAll().then((res) => setAdmins(res.data));
 
-    loadData();
+    loadData().finally(() => setLoading(false));
+
+    async function loadData() {
+      const interationsData = await interactionsService.getAll();
+      setInteracoes(interationsData.data);
+    }
   }, []);
 
   const handleStatusChange = async (id: string, novoStatus: StatusType) => {
@@ -45,8 +42,16 @@ export default function Dashboard() {
       prev.map((i) => (i.id === id ? { ...i, status: novoStatus } : i))
     );
   };
-
-  if (loading) return <p className="p-4">Carregando Dashboard...</p>;
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <div className="flex items-center gap-2 text-gray-600">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          <span>Carregando dashboard...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-8">
@@ -56,10 +61,26 @@ export default function Dashboard() {
 
       {/* Cards Resumo */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-        <DashboardCard title="Clientes" value={clients.length} />
-        <DashboardCard title="Produtos" value={products.length} />
-        <DashboardCard title="Admins" value={admins.length} />
-        <DashboardCard title="Interações" value={interacoes.length} />
+        <DashboardCard
+          title="Clientes"
+          value={clients.length}
+          icon={Users}
+        />
+        <DashboardCard
+          title="Produtos"
+          value={products.length}
+          icon={Package}
+        />
+        <DashboardCard
+          title="Admins"
+          value={admins.length}
+          icon={Shield}
+        />
+        <DashboardCard
+          title="Interações"
+          value={interacoes.length}
+          icon={Activity}
+        />
       </div>
 
       {/* Tabela de Interações */}
@@ -81,12 +102,16 @@ export default function Dashboard() {
                 <td className="p-2">{i.cliente.nome}</td>
                 <td className="p-2">{i.produto.name}</td>
                 <td className="p-2">{i.status}</td>
-                <td className="p-2">{new Date(i.dataInteration).toLocaleString()}</td>
+                <td className="p-2">
+                  {new Date(i.dataInteration).toLocaleString()}
+                </td>
                 <td className="p-2">
                   <select
                     title="status"
                     value={i.status}
-                    onChange={(e) => handleStatusChange(i.id, e.target.value as StatusType)}
+                    onChange={(e) =>
+                      handleStatusChange(i.id, e.target.value as StatusType)
+                    }
                     className="border p-1 rounded"
                   >
                     <option value="NOVO_LEAD">Novo Lead</option>
@@ -103,14 +128,25 @@ export default function Dashboard() {
   );
 }
 
-/* Subcomponente para os Cards */
-type DashboardCardProps = { title: string; value: number };
+import type { LucideIcon } from "lucide-react";
 
-function DashboardCard({ title, value }: DashboardCardProps) {
+type DashboardCardProps = {
+  title: string;
+  value: number;
+  icon: LucideIcon;
+};
+
+function DashboardCard({ title, value, icon: Icon }: DashboardCardProps) {
   return (
-    <div className="bg-white p-4 rounded-xl shadow hover:shadow-md transition">
-      <p className="text-gray-500">{title}</p>
-      <h3 className="text-2xl font-bold text-green-600">{value}</h3>
+    <div className="bg-white p-4 rounded-xl text-[#b95411] shadow hover:shadow-md transition flex items-center justify-between gap-4">
+      <div>
+        <p className="text-gray-500 text-sm">{title}</p>
+        <h3 className="text-2xl font-bold ">{value}</h3>
+      </div>
+
+      <div className="p-3 rounded-full bg-green-50">
+        <Icon className="w-8 h-8" strokeWidth={1.75} />
+      </div>
     </div>
   );
 }

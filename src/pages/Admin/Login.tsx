@@ -5,6 +5,7 @@ import { useAuth } from "../../context/authContext";
 import { toast } from "react-toastify";
 import axios from "../../services/lib/axios";
 import Input from "../../components/Input";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 
 function Login() {
   const { login } = useAuth();
@@ -12,11 +13,16 @@ function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); 
   const navigate = useNavigate();
 
   const isEmailValid = (email: string) => {
     const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     return regex.test(email);
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const Enter = async (e: React.FormEvent) => {
@@ -40,19 +46,16 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.post("api/login", { email, senha });
+      const response = await axios.post("/login", { email, senha });
       const { status, data } = response;
 
       if (status === 200) {
         toast.success("Login feito com sucesso!");
         const token = data.token;
-        const userData = data.user || { nome: "Administrador", role: "admin" };
-
-        // ✅ Atualiza o contexto corretamente
+        const userData = data.user;
         login(token, userData);
-
-        // ✅ Redireciona após login
         setTimeout(() => navigate("/painel/dashboard"), 1500);
+
       } else {
         toast.error("Erro ao fazer login.");
       }
@@ -81,6 +84,7 @@ function Login() {
           <h1 className="text-3xl font-semibold text-gray-800 mb-6">
             Painel Login
           </h1>
+          
 
           <form onSubmit={Enter} className="w-full flex flex-col gap-4">
             <div>
@@ -109,16 +113,26 @@ function Login() {
               >
                 Senha
               </label>
-              <Input
-                id="password"
-                type="password"
-                title="password"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                placeholder="******"
-                addClassName="text-gray-700 focus:ring-1 focus:ring-[#ba5511]"
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  title="password"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  placeholder="******"
+                  addClassName="text-gray-700 focus:ring-1 focus:ring-[#ba5511] pr-10" // Adicionado pr-10 para dar espaço ao ícone
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-0 right-0 pr-3 cursor-pointer flex items-center text-gray-400 hover:text-[#b95411] transition-colors"
+                  aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
+                >
+                  {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                </button>
+              </div>
             </div>
 
             <motion.button

@@ -16,7 +16,7 @@ export default function() {
         data-aos-duration="1500"
         className="flex-col gap-6 items-center justify-start p-6 bg-[#782143]">
           <div className="flex gap-4 items-center">
-            <img className="h-12 w-12 bg-pink-400 rounded-r-full" src="https://media.istockphoto.com/id/1486856046/vector/young-asian-woman-in-eyeglasses.jpg?s=612x612&w=0&k=20&c=ODiwWGFoAarv25jztH3W2m00P6cT72Md6T204Yb9dn0=" alt="avatar4" title="avatar4" />
+            <img className="h-12 w-12 rounded-r-full" src="https://media.istockphoto.com/id/1486856046/vector/young-asian-woman-in-eyeglasses.jpg?s=612x612&w=0&k=20&c=ODiwWGFoAarv25jztH3W2m00P6cT72Md6T204Yb9dn0=" alt="avatar4" title="avatar4" />
             <h6 className="font-semibold text-white">Sra. Dadi</h6>
             <div className="flex text-white/80"><IoMdStar /><IoMdStar /><IoMdStar /><IoMdStar /><IoIosStarOutline /></div>
           </div>
@@ -31,7 +31,7 @@ export default function() {
         data-aos-duration="1300"
         className="flex-col gap-6 items-center justify-start p-6 bg-black/80">
          <div className="flex gap-4 items-center">
-            <img className="h-12 w-12 bg-pink-400 rounded-r-full" src="https://media.istockphoto.com/id/1209837947/vector/portrait-of-a-young-african-girl-with-black-hair-vector-flat-illustration-on-a-transparent.jpg?s=612x612&w=0&k=20&c=5GG4py3debV_ALJY9DvUeZxEofUaec3jmFWMT2Kb9rg=" alt="avatar4" title="avatar4" />
+            <img className="h-12 w-12 rounded-r-full" src="https://media.istockphoto.com/id/1209837947/vector/portrait-of-a-young-african-girl-with-black-hair-vector-flat-illustration-on-a-transparent.jpg?s=612x612&w=0&k=20&c=5GG4py3debV_ALJY9DvUeZxEofUaec3jmFWMT2Kb9rg=" alt="avatar4" title="avatar4" />
             <h6 className="font-semibold text-white">Teresa Chilingó</h6>
             <div className="flex text-white/80"><IoMdStar /><IoMdStar /><IoMdStar /><IoMdStar /><IoMdStar /></div>
           </div>

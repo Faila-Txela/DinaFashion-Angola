@@ -1,4 +1,4 @@
-export type userAdmin = {
+export type Admin = {
     id: string;
     nome: string;
     email: string;

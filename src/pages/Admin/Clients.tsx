@@ -1,16 +1,23 @@
 import { useEffect, useState } from "react";
-import { getClients } from "../../services/api/clients";
-import type { Clients } from "../../services/types/clients";
+import { clientsService } from "../../services/api/clients/clients";
+import { Loader2 } from "lucide-react";
+
+type Client = {
+  id: string;
+  nome: string;
+  email: string;
+  phone?: string;
+}
 
 export default function ClientsList() {
-  const [clients, setClients] = useState<Clients[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const data = await getClients();
-        setClients(data);
+        const data = await clientsService.getAll();
+        setClients(data.data);
       } catch (error) {
         console.error("Erro ao carregar clientes:", error);
       } finally {
@@ -21,7 +28,16 @@ export default function ClientsList() {
     fetchClients();
   }, []);
 
-  if (loading) return <p>Carregando clientes...</p>;
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <div className="flex items-center gap-2 text-gray-600">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          <span>Carregando clientes...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4">
